@@ -25,7 +25,7 @@ markdown environments when grading them.
 
 ```{r setup, include=FALSE, results='hide'}
 #Source your main
-
+source('main.R')
 ```
 
 ## 1.  Reading and filtering count data
@@ -40,15 +40,18 @@ to reduce the size of our dataset if memory issues are a constraint.
 ### 1a. import data
 ```{r}
 #Read in verse_counts.tsv and display the head of the resulting tibble
-
+verse_counts <- read_data('data/verse_counts.tsv')
 #Display the top 10 rows of verse counts
+head(verse_counts, 10)
+
 ```
 
 ### 1b. Apply filter_zero_var_genes()
 ```{r}
 #Filter out zero variance genes using the function you created in `main.R
-
+verse_counts <- filter_zero_var_genes(verse_counts)
 #display the head of the counts data from the zero variance filter function's output
+head(verse_counts, 6)
 ```
 
 ## 2. Constructing sample meta data from sample names
@@ -67,7 +70,9 @@ with all the relevant information.
 
 ```{r}
 #Create and display the sample meta data tibble
-
+sample_names <- colnames(verse_counts)[-1]
+meta <- meta_info_from_labels(sample_names)
+meta
 ```
 
 ## 3. Normalization
@@ -102,8 +107,14 @@ the barplot or write the code in the RMarkdown at your discretion.
 
 ```{r}
 #Calculate the number of reads in each sample and plot as a barplot
+reads_cts <- get_library_size(verse_counts)
 
 #Make a barplot showing the number of millions of reads for each sample
+ggplot(reads_cts, aes(x=sample, y=value/1000000, fill=sample)) +
+  geom_bar(stat="identity") +
+  ylab('# reads') + # for the y axis label
+  xlab('Sample') # for the x axis label
+
 ```
 
 #### CPM calculation
@@ -113,6 +124,8 @@ the provided formula.
 
 ```{r}
 #Normalize your filtered counts matrix with CPM and display the head
+
+
 
 ```
 

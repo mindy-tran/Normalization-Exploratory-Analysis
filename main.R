@@ -16,7 +16,8 @@ library(DESeq2)
 #' @example `verse_counts <- read_data('verse_counts.tsv')`
 
 read_data <- function(filename){
-    return(NULL)
+  result <- read_delim(filename)
+  return(result)
 }
 
 
@@ -34,7 +35,19 @@ read_data <- function(filename){
 #' @example `filtered_counts <- filter_zero_var_genes(verse_counts)`
 
 filter_zero_var_genes <- function(verse_counts) {
-    return(NULL)
+  result <- verse_counts %>% 
+    # manipulate data to get column for rowwise variance
+    select(!gene) %>% 
+    mutate(row = row_number()) %>%
+    pivot_longer(-row) %>%
+    group_by(row) %>%
+    summarize(var = var(value)) %>%
+    bind_cols(verse_counts, .) %>% 
+    # filter out zero variance rows
+    filter(var!=0) %>% 
+    # remove temp columns
+    select(!c(row, var))
+  return(result)
 }
 
 
@@ -49,9 +62,9 @@ filter_zero_var_genes <- function(verse_counts) {
 #' output:`"Ad"`
 
 timepoint_from_sample <- function(x) {
-    return(NULL)
+  result <- substring(x, 2,3)
+  return(result)
 }
-
 
 #' Grab sample replicate number from sample name
 #'
@@ -64,8 +77,10 @@ timepoint_from_sample <- function(x) {
 #' output: `"1"`
 
 sample_replicate <- function(x) {
-    return(NULL)
+  result <- str_split(x, '_')[[1]][2] # split by _ and get second value
+  return(result)
 }
+# sample_replicate("vAd_1")
 
 
 #' Generate sample-level metadata from sample names.
@@ -78,7 +93,7 @@ sample_replicate <- function(x) {
 #' names from count data.
 #'
 #' @return tibble: a (_S_ x 3) tibble with column names "sample",
-#' "timepoint", and "replicate". "sample"holds sample_names; "timepoint"
+#' "timepoint", and "replicate". "sample" holds sample_names; "timepoint"
 #' stores sample time points; and "replicate" stores sample replicate
 #'
 #' @note _S_ < m
@@ -86,7 +101,12 @@ sample_replicate <- function(x) {
 #' @example `meta <- meta_info_from_labels(colnames(count_data)[colnames(count_data)!='gene'])`
 
 meta_info_from_labels <- function(sample_names) {
-    return(NULL)
+  result <- tibble(
+    sample = sample_names,
+    timepoint = timepoint_from_sample(sample_names),
+    replicate = sample_replicate(sample_names)
+  )
+  return(result)
 }
 
 
@@ -102,9 +122,20 @@ meta_info_from_labels <- function(sample_names) {
 #' @examples `get_library_size(count_data)`
 
 get_library_size <- function(count_data) {
-    return(NULL)
+  result <- verse_counts %>% select(-gene) %>% 
+    summarise(across(everything(), sum)) %>%
+    pivot_longer(cols = everything(), names_to = "sample", values_to = "value")
+  
+  return(result)
 }
 
+
+# helper function for normalize_by_cpm
+normalize <- function(x, sample_library_size){
+  # creating function for normalizing values
+  # count / (sample_library_size/10^6)
+  return(x / (sample_library_size/10**6))
+}
 
 #' Normalize raw count data to counts per million WITH pseudocounts using the
 #' following formula:
@@ -118,10 +149,17 @@ get_library_size <- function(count_data) {
 #'
 #' @examples
 #' `normalize_by_cpm(count_data)`
-
 normalize_by_cpm <- function(count_data) {
-    return(NULL)
+  #Calculate the number of reads in each sample
+  reads_cts <- get_library_size(count_data)
+  sample_library_size <- sum(reads_cts$value)
+  df <- as.data.frame(count_data)
+  result <- lapply(df,normalize, sample_library_size)
+  return(result)
 }
+
+normalize_by_cpm(verse_counts)
+
 
 #' Normalize raw count matrix using DESeq2
 #'
