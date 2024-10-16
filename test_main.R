@@ -1,6 +1,7 @@
 #!/usr/bin/Rscript
 source("main.R")
 library(testthat)
+# testthat::test_file('test_main.R')
 
 test_data <- as_tibble(read.csv("data/test.tsv", sep=""))
 td2 <- test_data[1:1000,]
