@@ -5,6 +5,8 @@ output: html_document
 ---
 
 # Welcome to Assignment 4
+# Mindy Tran
+# Fall 2024
 
 ## Before we begin
 
@@ -108,9 +110,9 @@ the barplot or write the code in the RMarkdown at your discretion.
 ```{r}
 #Calculate the number of reads in each sample and plot as a barplot
 reads_cts <- get_library_size(verse_counts)
-
+reads_cts
 #Make a barplot showing the number of millions of reads for each sample
-ggplot(reads_cts, aes(x=sample, y=value/1000000, fill=sample)) +
+ggplot(reads_cts, aes(x=fct_inorder(sample), y=value/1000000, fill=sample)) +
   geom_bar(stat="identity") +
   ylab('# reads') + # for the y axis label
   xlab('Sample') # for the x axis label
@@ -123,9 +125,9 @@ Implement the `normalize_by_cpm` function to normalize a raw count matrix given
 the provided formula.
 
 ```{r}
-#Normalize your filtered counts matrix with CPM and display the head
-
-
+# Normalize your filtered counts matrix with CPM and display the head
+verse_counts_cpm <- normalize_by_cpm(verse_counts)
+head(verse_counts_cpm)
 
 ```
 
@@ -148,7 +150,8 @@ may pass `~1` as the design formula to pass a trivial formula when creating the
 
 ```{r}
 #Normalize your filtered data and display the head of the resulting tibble
-
+verse_counts_dds <- deseq_normalize(verse_counts, meta)
+head(verse_counts_dds)
 ```
 
 ## 4 Visualization
@@ -166,7 +169,7 @@ function is able to scale the y-axis to $log10$ values if specified by the
 
 ```{r}
 #Create and display your count distributions boxplot
-
+plot_sample_distributions(verse_counts, TRUE, 'Sample Distribution (Log10(Raw Counts))')
 ```
 
 ### 4b. Count variance vs mean count
@@ -184,6 +187,7 @@ rank $1$.
 
 ```{r}
 #Create and display your variance vs mean plot
+plot_variance_vs_mean(verse_counts, TRUE, 'Variance vs Mean (Log10(Raw Counts))')
 
 ```
 
@@ -200,6 +204,7 @@ where each dot represents a sample and is colored by its respective sample name.
 
 ```{r}
 #Create and display your PCA plot
+plot_pca(verse_counts, meta, "Raw Count PCA")
 
 ```
 
@@ -219,6 +224,10 @@ to `scale_y_axis` when calling functions that have that parameter.
 
 ```{r}
 #Create and display 3 plots of your cpm matrix: Sample Distribution, Variance vs Mean, and PCA
+plot_sample_distributions(verse_counts_cpm, TRUE, 'Sample Distribution (log10(CPM))')
+plot_variance_vs_mean(verse_counts_cpm, TRUE, 'Variance vs Mean (log10(CPM))')
+plot_pca(verse_counts_cpm, meta, "CPM PCA")
+
 
 ```
 
@@ -237,5 +246,7 @@ display your Sample Distribution, Variance vs Mean, and PCA plots.
 
 ```{r}
 #Create and display 3 plots of your deseq-normalized data: Sample Distribution, Variance vs Mean, and PCA
-
+plot_sample_distributions(verse_counts_dds, TRUE, 'Sample Distribution (log10(DESeq2 norm counts)')
+plot_variance_vs_mean(verse_counts_dds, TRUE, 'Variance vs Mean (DESeq2)')
+plot_pca(verse_counts_dds, meta, "DESeq2 Normalized PCA")
 ```
