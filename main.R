@@ -208,31 +208,33 @@ deseq_normalize <- function(count_data, meta_data) {
 #'
 #' @examples
 #' `plot_pca(data, meta, "Raw Count PCA")`
-
 plot_pca <- function(data, meta, title="") {
-  # use plotPCA from DESeq2
-  # set up dds
-  mat <- data %>% select(-gene) %>% as.matrix() # matrix for countData
-  rownames(mat) <- data %>%  pull(gene)
-  # making a summarized experiment object
-  dds <- DESeqDataSetFromMatrix(countData = round(mat), # DESeqDataSet needs countData to be non-negative integers
-                                colData = meta,
-                                design = ~ timepoint) 
-  dds <- DESeq(dds)
+  data <- data %>% select(-gene)
   
-  # DESeq2 vignette and use either the VST or RLog transformation on the raw counts
-  rld <- rlog(dds, blind=FALSE)
+  # PCA on the samples (cols)
+  pca_result <- prcomp(t(data), center=TRUE, scale. = FALSE)
   
-  # PCA and plot
-  pcas <- plotPCA(rld, intgroup = "timepoint", returnData = TRUE)
-  percent_var <- round(100 * attr(pcas, "percentVar"))  # Get variance explained by each PC
-
-  # Step 4: Create PCA plot using ggplot2
-  g <- ggplot(pcas, aes(x = PC1, y = PC2, color = timepoint)) +
+  # get PCA scores for PC1 and PC2
+  pca_df <- as.data.frame(pca_result$x[, 1:2]) #isolate pc1 and pc2
+  colnames(pca_df) <- c("PC1", "PC2")
+  
+  # add sample names as rownames of pca_scores
+  pca_df$sample <- rownames(pca_df)
+  
+  # add meta info to pca_df
+  pca_df <- pca_df %>%
+    inner_join(meta, by = "sample") 
+  
+  # get percent_var for pca1 and pca2
+  percent_var <- summary(pca_result)$importance[2,]
+  
+  # plot
+  g <- ggplot(pca_df, aes(x = PC1, y = PC2, color = timepoint)) +
     geom_point() +
     labs(title = title,
-         x = paste0("PC1: ", percent_var[1], "% variance"),
-         y = paste0("PC2: ", percent_var[2], "% variance"))
+         # round() to get desired formatting for axis
+         x = paste0("PC1: ", round(100 *percent_var[1]), "% variance"),
+         y = paste0("PC2: ", round(100 *percent_var[2]), "% variance"))
   return(g)
 }
 
@@ -286,7 +288,7 @@ plot_variance_vs_mean <- function(data, scale_y_axis=FALSE, title="") {
            variance = var(c_across(-gene))) %>% # var for genes
     ungroup() %>% 
     arrange(mean_value) %>% # order by rank mean count
-    mutate(rank = row_number()) # set ranks
+    mutate(rank = rank(mean_value)) # set ranks
   
   # scatter plot
   g <- ggplot(data, aes(x = rank, y = variance)) +
