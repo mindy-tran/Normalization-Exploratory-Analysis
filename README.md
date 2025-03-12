@@ -1,4 +1,4 @@
-# Counts Data
+# DESeq2 Normalization of Counts Data
 
 ## Problem Statement
 
