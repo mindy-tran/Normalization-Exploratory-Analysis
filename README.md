@@ -1,14 +1,4 @@
-# Assignment Counts Data
-
-## Notes for this assignment
-
-For this and all future assignments, you will now have to code your markdown 
-file in addition to the main.R functions. The report.Rmd file still has the same 
-background and assignment information included and the R code blocks are created, 
-just like in previous assignments, but from now on they will devoid of code.
-
-Don't worry, there are instructions in report.Rmd to guide you through the code 
-blocks!
+# Counts Data
 
 ## Problem Statement
 
@@ -37,11 +27,7 @@ outputs you generate, they are still interacting with the display by viewing it
 and therefore the lines of code that call the functions to create these outputs
 belong in your "front end."
 
-## Required Readings
-
-Please read sections 9.7.5 to 9.7.9. This assignment will also draw on concepts from chapters 6, 7, 8.
-
-## Learning Objectives
+## Objectives
 - Data normalization methods (CPM, DESeq2)
 - Plotting data in Tidyverse
 - Displaying results and compiling reports in R Markdown
@@ -53,37 +39,10 @@ Please read sections 9.7.5 to 9.7.9. This assignment will also draw on concepts 
 - Creating different types of graphs in ggplot2
 - Running PCA
 
-## Instructions
-You will be given the following files:
-
-```
-main.R
-test_main.R
-report.Rmd
-verse_counts.tsv
-example_report.html
-
-```
-Like previous assignments, the bulk of the work will be done in the skeleton
-file `main.R`, but unlike previous assignments the provided `report.Rmd` is also
-a skeleton file. Both documents will provide the information needed to complete
-the assignment. Please ensure that your inputs and outputs match the
-specifications listed- or at the very least can properly handle inputs as
-instructed and return the expected output since that is how your functions will
-be tested.
-
-To help you complete the assignment, you are being provided a sample report and
-a set of test functions that are similar to the ones we will use to grade. The
-sample report is provided in the appropriately named `sample_report.html` and
-the tests for you to use can be found in `test_main.R`. Please note that while
-the sample report does not display any code, it is okay and- preferred, really-
-for your report to _display the code blocks_ like they have done in previous
-assignments.
-
 ### Tasks
 
 1. Implement the functions as described in `main.R`.  
-2. [optional but highly recommended] Test your functions using `test_main.R
+2. Test your functions using `test_main.R
 3. Fill in `report.Rmd` as instructed. You will need the functions you implemented in `main.R`
 4. Knit `report.Rmd` and create your `report.html`
 
@@ -251,33 +210,6 @@ values
 Details: This function will be tested on a `(n x _S_)` tibble. It will be tested
 for functionality of its inputs, handling of data, expected graph elements, and
 graph type. It may also be visually inspected as part of your grade
-
-## Hints
-
-* Make sure you don't have any rownames on any of the tibbles your function(s)
- return. You should get a warning in your R console if you do.
-
-* Sometimes Tydyverse is the best tool for the job, sometimes it isn't
-
-* Some tasks are easier to accomplish with dataframes than tibbles. Not everyone
-  will use these methods, but if you do you are welcome to use dataframes within
-  a function as long as the inputs and outputs are the ones specified (returning
-  a dataframe instead of a tibble may points).
-
-* The Bioconductor vignette for DESeq2 is linked in part 3 of your `report.Rmd`.
-  [It can also be found
-  here](http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#data-transformations-and-visualization))
-
-* In a previous version of this assignment, the output of
-  `filter_zero_var_genes()` was transformed from `(n x m)` to `(n x _s_)` and
-  called the `counts_matrix`. One of the TAs thought use of 'matrix' would be
-  confusing (since we want you to use datasets of type `tibble`) so it was
-  re-worded, but this piece of trivia might be helpful for interpreting the
-  Bioconductor vignette- or if you see any sort of 'matrix' referenced in
-  `report.Rmd` because it got overlooked during editing.
-
-* There may be occasions where you will need to reshape your data from a wide
- format to a long format
 
 * Symbols used in `main.R`~ `g`: initial number of Genes, `m`: initial number of
   columns expected when you import `verse_counts.tsv`, `n`: number of genes
